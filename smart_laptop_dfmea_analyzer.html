@@ -1,0 +1,512 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0e1a;--bg2:#111827;--bg3:#1a2235;--bg4:#1e2d42;
+  --border:#2a3a55;--border2:#3a4f70;
+  --accent:#00d4ff;--accent2:#0099cc;--accent3:#ff6b35;
+  --green:#00e676;--yellow:#ffd600;--red:#ff1744;
+  --text:#e8f0fe;--text2:#8da4c4;--text3:#4a6080;
+  --card-radius:16px;--font-display:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;--font-mono:'DM Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden}
+.scanline{position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,.015) 2px,rgba(0,212,255,.015) 4px);pointer-events:none;z-index:0}
+.grid-bg{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(0,212,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:24px 16px 60px}
+
+/* HEADER */
+.hdr{text-align:center;padding:40px 0 32px;position:relative}
+.hdr-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:40px;padding:6px 16px;font-family:var(--font-mono);font-size:11px;color:var(--accent);margin-bottom:20px;letter-spacing:1.5px}
+.pulse{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,230,118,.6)}70%{box-shadow:0 0 0 8px rgba(0,230,118,0)}}
+.hdr h1{font-family:var(--font-display);font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-1px;line-height:1.1;background:linear-gradient(135deg,#e8f0fe 0%,var(--accent) 50%,#7b9fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
+.hdr p{font-size:15px;color:var(--text2);max-width:460px;margin:0 auto;line-height:1.6}
+.hdr-line{width:80px;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:20px auto 0}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-radius);padding:24px;margin-bottom:16px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.4),transparent)}
+.card-title{font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.card-title svg{flex-shrink:0}
+
+/* FORM ELEMENTS */
+label.lbl{display:block;font-size:12px;font-weight:500;color:var(--text2);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px}
+select,textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-body);font-size:14px;padding:12px 16px;outline:none;transition:border-color .2s,box-shadow .2s;appearance:none;-webkit-appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg width='12' height='8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238da4c4' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:40px;cursor:pointer}
+select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,212,255,.1)}
+textarea{resize:vertical;min-height:90px;line-height:1.6}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+@media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr}}
+
+/* ISSUE CHIPS */
+.issues-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:4px}
+.issue-chip{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;user-select:none;position:relative}
+.issue-chip:hover{border-color:var(--border2);background:var(--bg4)}
+.issue-chip.active{border-color:var(--accent);background:rgba(0,212,255,.06);box-shadow:0 0 16px rgba(0,212,255,.12)}
+.issue-chip .ico{font-size:20px;flex-shrink:0;line-height:1}
+.issue-chip .chip-txt{font-size:13px;color:var(--text);line-height:1.3}
+.issue-chip .check{width:16px;height:16px;border:1.5px solid var(--border2);border-radius:4px;flex-shrink:0;margin-left:auto;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.issue-chip.active .check{background:var(--accent);border-color:var(--accent)}
+.issue-chip.active .check::after{content:'✓';font-size:10px;color:#000;font-weight:700}
+
+/* ANALYZE BUTTON */
+.btn-wrap{text-align:center;margin:24px 0}
+.btn-analyze{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#000;font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;border-radius:50px;padding:18px 60px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.btn-analyze:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,212,255,.35)}
+.btn-analyze:active{transform:translateY(0)}
+.btn-analyze::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);width:100%;height:100%;background:rgba(255,255,255,.15);border-radius:inherit;transition:transform .4s}
+.btn-analyze:active::after{transform:translate(-50%,-50%) scale(2);opacity:0}
+.btn-analyze:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* RESULTS */
+#results{display:none}
+.risk-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:500px){.risk-summary{grid-template-columns:1fr}}
+.risk-card{border-radius:12px;padding:18px;text-align:center;border:1px solid}
+.risk-card.high{background:rgba(255,23,68,.08);border-color:rgba(255,23,68,.3)}
+.risk-card.med{background:rgba(255,214,0,.08);border-color:rgba(255,214,0,.3)}
+.risk-card.low{background:rgba(0,230,118,.08);border-color:rgba(0,230,118,.3)}
+.risk-card .risk-num{font-family:var(--font-display);font-size:36px;font-weight:800;line-height:1}
+.risk-card.high .risk-num{color:var(--red)}
+.risk-card.med .risk-num{color:var(--yellow)}
+.risk-card.low .risk-num{color:var(--green)}
+.risk-card .risk-lbl{font-size:12px;color:var(--text2);margin-top:4px;letter-spacing:.5px}
+
+/* TOP CRITICAL */
+.top3{margin-bottom:20px}
+.top3-title{font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:2px;color:var(--accent3);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.top3-item{background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.25);border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.top3-rank{font-family:var(--font-mono);font-size:11px;color:var(--accent3);font-weight:500;min-width:24px}
+.top3-name{font-size:13px;font-weight:500;flex:1}
+.top3-rpn{font-family:var(--font-mono);font-size:14px;font-weight:500;color:var(--accent3)}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:var(--text2);padding:12px 14px;text-align:left;border-bottom:1px solid var(--border);text-transform:uppercase;background:var(--bg3)}
+th:first-child{border-radius:8px 0 0 0}
+th:last-child{border-radius:0 8px 0 0}
+td{padding:14px;border-bottom:1px solid rgba(42,58,85,.5);vertical-align:top;color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:3px 10px;font-family:var(--font-mono);font-size:11px;font-weight:500;white-space:nowrap}
+.badge.high{background:rgba(255,23,68,.15);color:#ff6b6b;border:1px solid rgba(255,23,68,.25)}
+.badge.medium{background:rgba(255,214,0,.12);color:#ffd600;border:1px solid rgba(255,214,0,.2)}
+.badge.low{background:rgba(0,230,118,.12);color:#00e676;border:1px solid rgba(0,230,118,.2)}
+.rpn-val{font-family:var(--font-mono);font-size:15px;font-weight:500}
+.rpn-val.high{color:var(--red)}
+.rpn-val.medium{color:var(--yellow)}
+.rpn-val.low{color:var(--green)}
+.score-pill{font-family:var(--font-mono);font-size:12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:2px 8px;color:var(--text2)}
+
+/* RISK METER */
+.meter-wrap{margin-bottom:24px}
+.meter-label{font-size:12px;color:var(--text2);margin-bottom:8px;display:flex;justify-content:space-between}
+.meter-bar{height:12px;background:var(--bg3);border-radius:6px;overflow:hidden;border:1px solid var(--border)}
+.meter-fill{height:100%;border-radius:6px;transition:width 1s cubic-bezier(.34,1.56,.64,1);background:linear-gradient(90deg,var(--green) 0%,var(--yellow) 50%,var(--red) 100%);background-size:400px 12px;position:relative}
+
+/* SUGGESTIONS */
+.suggest-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.suggest-grid{grid-template-columns:1fr}}
+.suggest-block{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px}
+.suggest-block h4{font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.suggest-block.mech h4{color:#7b9fff}
+.suggest-block.soft h4{color:#a78bfa}
+.suggest-block.prev h4{color:var(--green)}
+.suggest-list li{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px;padding-left:20px;position:relative;list-style:none}
+.suggest-list li::before{content:'→';position:absolute;left:0;color:inherit;font-size:12px}
+.suggest-block.mech .suggest-list li::before{color:#7b9fff}
+.suggest-block.soft .suggest-list li::before{color:#a78bfa}
+.suggest-block.prev .suggest-list li::before{color:var(--green)}
+
+/* CHATBOT */
+.chat-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:8px}
+.chat-history{height:220px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.chat-history::-webkit-scrollbar{width:4px}
+.chat-history::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.msg{max-width:85%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5}
+.msg.user{background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.2);align-self:flex-end;color:var(--text)}
+.msg.bot{background:var(--bg4);border:1px solid var(--border);align-self:flex-start;color:var(--text2)}
+.msg.bot strong{color:var(--text)}
+.chat-input-row{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border)}
+.chat-inp{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:13px;padding:10px 14px;outline:none;transition:border-color .2s}
+.chat-inp:focus{border-color:var(--accent)}
+.chat-send{background:var(--accent);color:#000;border:none;border-radius:8px;width:38px;height:38px;cursor:pointer;font-size:16px;transition:background .2s;flex-shrink:0}
+.chat-send:hover{background:var(--accent2)}
+
+/* DOWNLOAD */
+.btn-dl{background:transparent;border:1px solid var(--border2);color:var(--text2);font-family:var(--font-display);font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-radius:8px;padding:10px 20px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-dl:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,.05)}
+
+/* LOADING */
+.loading{display:none;text-align:center;padding:40px}
+.spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{font-family:var(--font-mono);font-size:13px;color:var(--text2)}
+
+/* FADE IN */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp .5s ease forwards}
+
+select option{background:var(--bg2)}
+</style>
+
+<div class="scanline"></div>
+<div class="grid-bg"></div>
+
+<div class="wrap">
+
+<div class="hdr fade-in">
+  <div class="hdr-badge"><span class="pulse"></span> DFMEA ENGINE v2.0</div>
+  <h1>Smart Laptop<br>DFMEA Analyzer</h1>
+  <p>AI-driven failure mode analysis with Risk Priority Number calculation and guided remediation</p>
+  <div class="hdr-line"></div>
+</div>
+
+<!-- INPUT CARD -->
+<div class="card fade-in" style="animation-delay:.1s">
+  <div class="card-title">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 8h6M8 5v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    System Configuration
+  </div>
+  <div class="grid3">
+    <div>
+      <label class="lbl">Laptop Brand</label>
+      <select id="brand">
+        <option value="">Select brand</option>
+        <option>Dell</option><option>HP</option><option>Lenovo</option>
+        <option>ASUS</option><option>Acer</option><option>Apple</option>
+        <option>MSI</option><option>Custom / Other</option>
+      </select>
+    </div>
+    <div>
+      <label class="lbl">Processor</label>
+      <select id="proc">
+        <option value="">Select processor</option>
+        <option>Intel i3 Gen 6–10</option><option>Intel i5 Gen 6–10</option>
+        <option>Intel i7 Gen 6–10</option><option>Intel i5 Gen 11–14</option>
+        <option>Intel i7 Gen 11–14</option><option>Intel i9 Gen 11–14</option>
+        <option>AMD Ryzen 3</option><option>AMD Ryzen 5</option>
+        <option>AMD Ryzen 7</option><option>AMD Ryzen 9</option>
+        <option>Apple M1</option><option>Apple M2</option><option>Apple M3</option>
+      </select>
+    </div>
+    <div>
+      <label class="lbl">Usage Type</label>
+      <select id="usage">
+        <option value="">Select usage</option>
+        <option>Gaming</option><option>Office Work</option>
+        <option>Student</option><option>Heavy Editing</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ISSUES CARD -->
+<div class="card fade-in" style="animation-delay:.2s">
+  <div class="card-title">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v4M8 11v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Reported Issues <span style="font-size:11px;color:var(--text3);font-weight:400;letter-spacing:0;text-transform:none;margin-left:8px">Select all that apply</span>
+  </div>
+  <div class="issues-grid" id="issueGrid"></div>
+</div>
+
+<!-- DESCRIPTION CARD -->
+<div class="card fade-in" style="animation-delay:.3s">
+  <div class="card-title">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 7h6M5 9.5h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Additional Details (Optional)
+  </div>
+  <textarea id="desc" placeholder="Describe when the issue occurs, frequency, any recent changes (hardware/software), environmental conditions..."></textarea>
+</div>
+
+<div class="btn-wrap fade-in" style="animation-delay:.4s">
+  <button class="btn-analyze" onclick="runAnalysis()">⚙ Run DFMEA Analysis</button>
+</div>
+
+<!-- LOADING -->
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <p>Processing failure modes...</p>
+</div>
+
+<!-- RESULTS -->
+<div id="results">
+
+  <div class="card fade-in">
+    <div class="card-title">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 12L6 6l3 4 2-3 3 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Risk Overview
+    </div>
+    <div class="risk-summary" id="riskSummary"></div>
+    <div class="meter-wrap">
+      <div class="meter-label"><span>Overall System Risk</span><span id="riskPct">–</span></div>
+      <div class="meter-bar"><div class="meter-fill" id="meterFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="card fade-in">
+    <div class="top3">
+      <div class="top3-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.5 3.5L12 5l-2.5 2.5.5 3.5L7 9.5 4 11l.5-3.5L2 5l3.5-.5L7 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        Top 3 Critical Issues
+      </div>
+      <div id="top3List"></div>
+    </div>
+
+    <div class="card-title" style="margin-top:4px">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M1 6h14" stroke="currentColor" stroke-width="1.5"/></svg>
+      DFMEA Results Table
+    </div>
+    <div class="tbl-wrap">
+      <table id="dfmeaTable">
+        <thead>
+          <tr>
+            <th>Issue</th><th>Failure Mode</th><th>Effect</th>
+            <th>S</th><th>O</th><th>D</th><th>RPN</th><th>Risk</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card fade-in">
+    <div class="card-title">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h2l2-5 2 9 2-4h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Remediation & Preventive Actions
+    </div>
+    <div class="suggest-grid" id="suggestGrid"></div>
+  </div>
+
+  <div class="card fade-in">
+    <div class="card-title">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M6 7c0-1.1.9-2 2-2s2 .9 2 2c0 .8-.5 1.5-1.2 1.8L8 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="12" r=".8" fill="currentColor"/></svg>
+      AI Diagnostic Assistant
+    </div>
+    <div class="chat-wrap">
+      <div class="chat-history" id="chatHistory">
+        <div class="msg bot">Hello! I'm your DFMEA diagnostic assistant. Ask me about failure modes, RPN scores, or specific laptop issues. Try: <strong>"Why is my RPN so high?"</strong> or <strong>"How do I fix thermal issues?"</strong></div>
+      </div>
+      <div class="chat-input-row">
+        <input class="chat-inp" id="chatInput" placeholder="Ask about your analysis..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="chat-send" onclick="sendChat()">↑</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:16px">
+    <button class="btn-dl" onclick="downloadReport()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 7l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download Report (TXT)
+    </button>
+  </div>
+
+</div>
+</div>
+
+<script>
+const ISSUES=[
+  {id:'fan',ico:'🌀',label:'Fan vibration',mode:'Bearing wear / imbalance',effect:'Noise, vibration, premature failure',s:6,o:7,d:5,cat:'mechanical'},
+  {id:'heat',ico:'🌡️',label:'Excess heating',mode:'Poor thermal dissipation',effect:'Throttling, instability, component damage',s:8,o:7,d:6,cat:'thermal'},
+  {id:'trackpad',ico:'⚡',label:'Current on trackpad',mode:'Grounding / insulation fault',effect:'Shock hazard, safety risk',s:9,o:4,d:7,cat:'electrical'},
+  {id:'pixels',ico:'🖥️',label:'Dead pixels',mode:'Display panel cell defect',effect:'Visual degradation, warranty claim',s:5,o:5,d:3,cat:'display'},
+  {id:'charge',ico:'🔋',label:'Slow charging',mode:'Charger/port impedance mismatch',effect:'Extended downtime, battery degradation',s:5,o:6,d:4,cat:'power'},
+  {id:'crash',ico:'💥',label:'System crash',mode:'Thermal throttle / memory fault',effect:'Data loss, productivity impact',s:9,o:6,d:6,cat:'system'},
+  {id:'drain',ico:'📉',label:'Battery draining fast',mode:'Cell degradation / parasitic load',effect:'Reduced portability, replacement cost',s:6,o:8,d:4,cat:'power'},
+  {id:'kbheat',ico:'⌨️',label:'Keyboard heating',mode:'Localized thermal hotspot',effect:'Discomfort, keyboard failure',s:6,o:5,d:5,cat:'thermal'},
+  {id:'flicker',ico:'📺',label:'Screen flickering',mode:'GPU / display cable intermittency',effect:'Eye strain, data loss risk',s:7,o:6,d:6,cat:'display'}
+];
+
+const SUGGEST={
+  mechanical:["Clean cooling fan and vent ducts thoroughly","Replace dried thermal paste with quality compound","Inspect heat sink contact and re-seat if needed","Check and tighten all internal chassis screws","Replace worn fan bearings or the full fan assembly"],
+  electrical:["Inspect AC adapter grounding and cable integrity","Use a grounded 3-pin power outlet","Check motherboard grounding points","Replace power adapter if current leakage confirmed","Add anti-static wrist strap during maintenance"],
+  thermal:["Apply high-quality thermal compound (e.g. Thermal Grizzly)","Clean heatsink fins with compressed air","Ensure all thermal pads are in good contact","Repaste GPU as well if present","Consider liquid metal compound for extreme cases"],
+  display:["Run dead pixel repair software (JScreenFix)","Check display cable connection at both ends","Update GPU drivers to latest stable version","Reduce screen brightness / refresh rate temporarily","Replace display panel if >3 dead pixels in cluster"],
+  power:["Calibrate battery (full discharge → full charge)","Replace battery if cycle count >500","Check charging port for debris or damage","Use OEM or certified charger only","Adjust Windows/macOS power plan to Balanced"],
+  system:["Update BIOS and all device drivers","Check RAM with MemTest86 (overnight pass)","Run system stability tests (Cinebench, AIDA64)","Reduce background processes and startup items","Check Event Viewer logs for critical errors"]
+};
+
+const SOFT_SUGGEST=["Update BIOS firmware to latest stable build","Install latest chipset and GPU drivers","Use manufacturer's power management utility","Reduce background process load via Task Manager","Enable XMP/EXPO profile only if RAM is rated for it","Schedule monthly disk cleanup and defrag (HDD only)","Monitor temps with HWiNFO64 or Intel XTU"];
+
+const PREV_SUGGEST=["Use a quality cooling pad on hard flat surfaces","Never use laptop on bed / sofa (blocks vents)","Schedule quarterly internal cleaning","Avoid charging to 100% overnight — use 80% limit","Store in dry, dust-free environment","Use laptop stand for better airflow clearance","Keep OS and security software updated"];
+
+let selected=new Set(),analysisData=null;
+
+// Render issue chips
+const grid=document.getElementById('issueGrid');
+ISSUES.forEach(iss=>{
+  const d=document.createElement('div');
+  d.className='issue-chip';d.dataset.id=iss.id;
+  d.innerHTML=`<span class="ico">${iss.ico}</span><span class="chip-txt">${iss.label}</span><span class="check"></span>`;
+  d.onclick=()=>{
+    d.classList.toggle('active');
+    if(d.classList.contains('active'))selected.add(iss.id);
+    else selected.delete(iss.id);
+  };
+  grid.appendChild(d);
+});
+
+function getRiskLevel(rpn){
+  if(rpn>=200)return'high';
+  if(rpn>=100)return'medium';
+  return'low';
+}
+
+function runAnalysis(){
+  if(selected.size===0){alert('Please select at least one issue to analyze.');return;}
+  document.getElementById('loading').style.display='block';
+  document.getElementById('results').style.display='none';
+  setTimeout(()=>{
+    document.getElementById('loading').style.display='none';
+    buildResults();
+    document.getElementById('results').style.display='block';
+    document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+  },1600);
+}
+
+function buildResults(){
+  const brand=document.getElementById('brand').value||'Unknown';
+  const proc=document.getElementById('proc').value||'Unknown';
+  const usage=document.getElementById('usage').value||'General';
+
+  let rows=ISSUES.filter(i=>selected.has(i.id)).map(i=>{
+    let s=i.s,o=i.o,d=i.d;
+    if(usage==='Gaming'&&(i.cat==='thermal'||i.cat==='mechanical')){s=Math.min(10,s+1);o=Math.min(10,o+1);}
+    if(usage==='Heavy Editing'&&i.cat==='thermal'){o=Math.min(10,o+1);}
+    if(brand==='MSI'&&i.cat==='thermal'){o=Math.min(10,o-1);}
+    if(brand==='Apple'&&i.cat==='thermal'){s=Math.min(10,s-1);}
+    const rpn=s*o*d;
+    return{...i,s,o,d,rpn,risk:getRiskLevel(rpn)};
+  });
+  rows.sort((a,b)=>b.rpn-a.rpn);
+  analysisData={rows,brand,proc,usage};
+
+  const high=rows.filter(r=>r.risk==='high').length;
+  const med=rows.filter(r=>r.risk==='medium').length;
+  const low=rows.filter(r=>r.risk==='low').length;
+  document.getElementById('riskSummary').innerHTML=`
+    <div class="risk-card high"><div class="risk-num">${high}</div><div class="risk-lbl">HIGH RISK</div></div>
+    <div class="risk-card med"><div class="risk-num">${med}</div><div class="risk-lbl">MEDIUM RISK</div></div>
+    <div class="risk-card low"><div class="risk-num">${low}</div><div class="risk-lbl">LOW RISK</div></div>
+  `;
+  const maxRPN=rows.reduce((a,r)=>Math.max(a,r.rpn),0);
+  const avgRPN=rows.length?Math.round(rows.reduce((a,r)=>a+r.rpn,0)/rows.length):0;
+  const pct=Math.min(100,Math.round((avgRPN/500)*100));
+  document.getElementById('riskPct').textContent=`Avg RPN: ${avgRPN}`;
+  setTimeout(()=>{document.getElementById('meterFill').style.width=pct+'%';},100);
+
+  const top3=rows.slice(0,3);
+  document.getElementById('top3List').innerHTML=top3.map((r,i)=>`
+    <div class="top3-item">
+      <span class="top3-rank">#${i+1}</span>
+      <span style="font-size:18px">${r.ico}</span>
+      <span class="top3-name">${r.label} — <span style="color:var(--text3);font-size:12px">${r.mode}</span></span>
+      <span class="top3-rpn">RPN ${r.rpn}</span>
+    </div>
+  `).join('');
+
+  document.getElementById('tableBody').innerHTML=rows.map(r=>`
+    <tr>
+      <td><span style="font-size:16px">${r.ico}</span> ${r.label}</td>
+      <td style="color:var(--text2);font-size:12px">${r.mode}</td>
+      <td style="color:var(--text2);font-size:12px;max-width:120px">${r.effect}</td>
+      <td><span class="score-pill">${r.s}</span></td>
+      <td><span class="score-pill">${r.o}</span></td>
+      <td><span class="score-pill">${r.d}</span></td>
+      <td><span class="rpn-val ${r.risk}">${r.rpn}</span></td>
+      <td><span class="badge ${r.risk}">${r.risk.charAt(0).toUpperCase()+r.risk.slice(1)}</span></td>
+    </tr>
+  `).join('');
+
+  const cats=[...new Set(rows.map(r=>r.cat))];
+  const mechSugg=[...new Set(cats.flatMap(c=>SUGGEST[c]||[]))].slice(0,5);
+  document.getElementById('suggestGrid').innerHTML=`
+    <div class="suggest-block mech">
+      <h4><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2L12 5v4L7 12 2 9V5L7 2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>Mechanical</h4>
+      <ul class="suggest-list">${mechSugg.map(s=>`<li>${s}</li>`).join('')}</ul>
+    </div>
+    <div class="suggest-block soft">
+      <h4><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 12h4M7 10v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Software</h4>
+      <ul class="suggest-list">${SOFT_SUGGEST.slice(0,5).map(s=>`<li>${s}</li>`).join('')}</ul>
+    </div>
+    <div class="suggest-block prev" style="grid-column:1/-1">
+      <h4><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2a5 5 0 100 10A5 5 0 007 2z" stroke="currentColor" stroke-width="1.2"/><path d="M7 5v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Preventive Actions</h4>
+      <ul class="suggest-list" style="columns:2;gap:24px">${PREV_SUGGEST.map(s=>`<li>${s}</li>`).join('')}</ul>
+    </div>
+  `;
+}
+
+// Chatbot
+const CHAT_KB={
+  rpn:["RPN (Risk Priority Number) = Severity × Occurrence × Detection. Higher RPN means higher priority for action. RPN > 200 is critical, 100–200 is moderate, <100 is low.","Focus on reducing the factor with the highest value first — usually Severity or Occurrence."],
+  thermal:["Thermal issues are the #1 laptop killer. Replace thermal paste every 2–3 years. Dry paste causes 20–40°C increase in CPU temps.","A clogged heatsink can reduce thermal performance by 60%. Compressed air cleaning should be done every 6 months."],
+  battery:["Lithium-ion batteries degrade after ~500 full cycles. Keep charge between 20–80% for longevity.","Calibrate your battery by doing a full discharge once a month for accurate readings."],
+  fan:["Fan vibration often indicates bearing wear. A replacement fan costs ₹800–2500 and can be replaced by an end user with basic tools.","Check for debris lodged in fan blades — a common cause of vibration in dusty environments."],
+  crash:["System crashes under load are often thermal throttling — run HWiNFO64 to monitor temperatures. TJunction > 95°C for Intel is critical.","MemTest86 overnight can rule out RAM issues. A single-pass error indicates faulty RAM."],
+  severity:["Severity (S) rates the impact of the failure effect on 1–10. S=9–10 reserved for safety hazards. Trackpad current leakage ranks S=9 due to shock risk.","Cannot reduce Severity without redesigning the system. Focus on Occurrence and Detection instead."],
+  detection:["Detection (D) rates how easily the failure can be found before it causes harm. D=1 is easy to detect, D=9 means you won't notice until failure.","Implement diagnostics and monitoring to reduce your Detection score."],
+  default:["I can help explain DFMEA concepts, RPN scores, or specific issues. Try asking about 'thermal paste', 'battery health', 'RPN meaning', or 'fan noise'.","Based on your analysis, focus on the highest-RPN issues first for maximum safety improvement."]
+};
+
+function sendChat(){
+  const inp=document.getElementById('chatInput');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  const hist=document.getElementById('chatHistory');
+  hist.innerHTML+=`<div class="msg user">${txt}</div>`;
+  inp.value='';
+  const key=txt.toLowerCase();
+  let resp;
+  if(key.includes('rpn')||key.includes('risk priority'))resp=CHAT_KB.rpn[Math.floor(Math.random()*CHAT_KB.rpn.length)];
+  else if(key.includes('thermal')||key.includes('heat')||key.includes('temp'))resp=CHAT_KB.thermal[Math.floor(Math.random()*CHAT_KB.thermal.length)];
+  else if(key.includes('battery')||key.includes('drain')||key.includes('charg'))resp=CHAT_KB.battery[Math.floor(Math.random()*CHAT_KB.battery.length)];
+  else if(key.includes('fan')||key.includes('vibrat'))resp=CHAT_KB.fan[Math.floor(Math.random()*CHAT_KB.fan.length)];
+  else if(key.includes('crash')||key.includes('freeze')||key.includes('bsod'))resp=CHAT_KB.crash[Math.floor(Math.random()*CHAT_KB.crash.length)];
+  else if(key.includes('severity'))resp=CHAT_KB.severity[Math.floor(Math.random()*CHAT_KB.severity.length)];
+  else if(key.includes('detect'))resp=CHAT_KB.detection[Math.floor(Math.random()*CHAT_KB.detection.length)];
+  else if(analysisData&&(key.includes('worst')||key.includes('critical')||key.includes('top'))){
+    const top=analysisData.rows[0];
+    resp=`Your most critical issue is <strong>${top.label}</strong> with RPN ${top.rpn} (S:${top.s} × O:${top.o} × D:${top.d}). Focus on ${top.cat} remediation first.`;
+  }
+  else resp=CHAT_KB.default[Math.floor(Math.random()*CHAT_KB.default.length)];
+  setTimeout(()=>{
+    hist.innerHTML+=`<div class="msg bot">${resp}</div>`;
+    hist.scrollTop=hist.scrollHeight;
+  },600);
+  hist.scrollTop=hist.scrollHeight;
+}
+
+function downloadReport(){
+  if(!analysisData){alert('Run an analysis first.');return;}
+  const {rows,brand,proc,usage}=analysisData;
+  let txt=`SMART LAPTOP DFMEA ANALYSIS REPORT\n${'='.repeat(50)}\n`;
+  txt+=`Date: ${new Date().toLocaleDateString()}\n`;
+  txt+=`Brand: ${brand} | Processor: ${proc} | Usage: ${usage}\n\n`;
+  txt+=`DFMEA RESULTS TABLE\n${'-'.repeat(80)}\n`;
+  txt+=`${'Issue'.padEnd(22)}${'Mode'.padEnd(28)}S  O  D  RPN  Risk\n${'-'.repeat(80)}\n`;
+  rows.forEach(r=>{
+    txt+=`${r.label.padEnd(22)}${r.mode.padEnd(28)}${r.s}  ${r.o}  ${r.d}  ${String(r.rpn).padEnd(5)}${r.risk.toUpperCase()}\n`;
+  });
+  txt+=`\nRISK SUMMARY\n${'-'.repeat(40)}\n`;
+  txt+=`High Risk Issues: ${rows.filter(r=>r.risk==='high').length}\n`;
+  txt+=`Medium Risk Issues: ${rows.filter(r=>r.risk==='medium').length}\n`;
+  txt+=`Low Risk Issues: ${rows.filter(r=>r.risk==='low').length}\n`;
+  txt+=`\nTOP CRITICAL ISSUES\n${'-'.repeat(40)}\n`;
+  rows.slice(0,3).forEach((r,i)=>{txt+=`${i+1}. ${r.label} (RPN: ${r.rpn})\n`;});
+  txt+=`\nMECHANICAL RECOMMENDATIONS\n${'-'.repeat(40)}\n`;
+  SUGGEST.mechanical.forEach((s,i)=>{txt+=`${i+1}. ${s}\n`;});
+  txt+=`\nSOFTWARE RECOMMENDATIONS\n${'-'.repeat(40)}\n`;
+  SOFT_SUGGEST.forEach((s,i)=>{txt+=`${i+1}. ${s}\n`;});
+  txt+=`\nPREVENTIVE ACTIONS\n${'-'.repeat(40)}\n`;
+  PREV_SUGGEST.forEach((s,i)=>{txt+=`${i+1}. ${s}\n`;});
+  txt+=`\n${'='.repeat(50)}\nGenerated by Smart Laptop DFMEA Analyzer\n`;
+  const blob=new Blob([txt],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`DFMEA_Report_${brand.replace(/\s/g,'_')}_${Date.now()}.txt`;
+  a.click();
+}
+</script>
